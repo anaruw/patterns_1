@@ -3,6 +3,7 @@ package ru.netology.service;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Selenide;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import ru.netology.data.UserData;
 import ru.netology.util.DataGenerator;
 
@@ -23,7 +24,7 @@ public class ReplanDeliveryTest {
 
         $("[data-test-id='city'] input").setValue(testUser.getCity());
         $("[data-test-id='date'] input")
-                .doubleClick()
+                .press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE)
                 .setValue(testUser.getDate());
 
         $("[data-test-id='name'] input").setValue(testUser.getName());
@@ -35,26 +36,32 @@ public class ReplanDeliveryTest {
         $(".grid-row .button").click();
 
         $("[data-test-id='success-notification'] .notification__content")
-                .shouldBe(Condition.visible, Duration.ofSeconds(15))
-                .innerHtml().equals("Встреча успешно запланирована на " + testUser.getDate());
+                .shouldBe(Condition.allOf(
+                        Condition.visible,
+                        Condition.exactText("Встреча успешно запланирована на " + testUser.getDate())
+                ), Duration.ofSeconds(15));
 
         testUser = testUser.withDate(DataGenerator.changeDate(earlyDate, dateBound, pattern, testUser.getDate()));
 
         $("[data-test-id='date'] input")
-                .doubleClick()
+                .press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE)
                 .setValue(testUser.getDate());
 
         $(".grid-row .button").click();
 
         $("[data-test-id='replan-notification'] .notification__content")
-                .shouldBe(Condition.visible, Duration.ofSeconds(15))
-                .innerHtml().equals("У вас уже запланирована встреча на другую дату. Перепланировать?");
+                .shouldBe(Condition.allOf(
+                        Condition.visible,
+                        Condition.exactText("У вас уже запланирована встреча на другую дату. Перепланировать?\n\nПерепланировать")
+                ), Duration.ofSeconds(15));
 
         $("[data-test-id='replan-notification'] .button").click();
 
         $("[data-test-id='success-notification'] .notification__content")
-                .shouldBe(Condition.visible, Duration.ofSeconds(15))
-                .innerHtml().equals("Встреча успешно запланирована на " + testUser.getDate());
+                .shouldBe(Condition.allOf(
+                        Condition.visible,
+                        Condition.exactText("Встреча успешно запланирована на " + testUser.getDate())
+                ), Duration.ofSeconds(15));
 
         Selenide.closeWebDriver();
     }
