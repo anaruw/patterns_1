@@ -75,7 +75,7 @@ public class DataGenerator {
     public String changeName(String unsuitedName) {
         String result;
         do {
-            result = faker.name().fullName();
+            result = nameGenerator();
         } while (result.equals(unsuitedName));
         return result;
     }
@@ -87,7 +87,7 @@ public class DataGenerator {
     public String changePhone(String unsuitedPhone) {
         String result;
         do {
-            result = faker.numerify("+7##########");
+            result = phoneGenerator();
         } while (result.equals(unsuitedPhone));
         return result;
     }
