@@ -8,27 +8,24 @@ import ru.netology.data.UserData;
 import ru.netology.util.DataGenerator;
 
 import java.time.Duration;
-import java.time.LocalDate;
 
 import static com.codeborne.selenide.Selenide.$;
 
 public class ReplanDeliveryTest {
-    LocalDate earlyDate = LocalDate.now().plusDays(3);
-    int dateBound = 14;
-    String pattern = "dd.MM.yyyy";
-    UserData testUser = DataGenerator.userGenerator(earlyDate, dateBound, pattern);
 
     @Test
     public void shouldReplanDeliveryDate() {
+        UserData user = DataGenerator.userGenerator();
+
         Selenide.open("http://localhost:9999");
 
-        $("[data-test-id='city'] input").setValue(testUser.getCity());
+        $("[data-test-id='city'] input").setValue(user.getCity());
         $("[data-test-id='date'] input")
                 .press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE)
-                .setValue(testUser.getDate());
+                .setValue(user.getDate());
 
-        $("[data-test-id='name'] input").setValue(testUser.getName());
-        $("[data-test-id='phone'] input").setValue(testUser.getPhone());
+        $("[data-test-id='name'] input").setValue(user.getName());
+        $("[data-test-id='phone'] input").setValue(user.getPhone());
 
         if (!$("[data-test-id='agreement'] input").isSelected()) {
             $("[data-test-id='agreement']").click();
@@ -38,14 +35,14 @@ public class ReplanDeliveryTest {
         $("[data-test-id='success-notification'] .notification__content")
                 .shouldBe(Condition.allOf(
                         Condition.visible,
-                        Condition.exactText("Встреча успешно запланирована на " + testUser.getDate())
+                        Condition.exactText("Встреча успешно запланирована на " + user.getDate())
                 ), Duration.ofSeconds(15));
 
-        testUser = testUser.withDate(DataGenerator.changeDate(earlyDate, dateBound, pattern, testUser.getDate()));
+        user = user.withDate(DataGenerator.changeDate(user.getDate()));
 
         $("[data-test-id='date'] input")
                 .press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE)
-                .setValue(testUser.getDate());
+                .setValue(user.getDate());
 
         $(".grid-row .button").click();
 
@@ -60,9 +57,7 @@ public class ReplanDeliveryTest {
         $("[data-test-id='success-notification'] .notification__content")
                 .shouldBe(Condition.allOf(
                         Condition.visible,
-                        Condition.exactText("Встреча успешно запланирована на " + testUser.getDate())
+                        Condition.exactText("Встреча успешно запланирована на " + user.getDate())
                 ), Duration.ofSeconds(15));
-
-        Selenide.closeWebDriver();
     }
 }
